@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace chessings
@@ -16,19 +9,21 @@ namespace chessings
     {
         Pen p = new Pen(Color.Black, 2);
         static Point center = new Point();
-        static List<Point> s = new List<Point>();
+        static List<PointF> s = new List<PointF>();
         Timer t = new Timer();
         public Form1()
         {
             InitializeComponent();
+            Size x = new Size(200, 200); //change size, you can make rectangles btw not only squares
             center = new Point(Width / 2, Height / 2);
-            s.Add(new Point(center.X - 50, center.Y - 50));
-            s.Add(new Point(s[0].X + 100, s[0].Y));
-            s.Add(new Point(s[0].X, s[0].Y + 100));
-            s.Add(new Point(s[0].X + 100, s[0].Y + 100));
-            t.Interval = 200;
+            s.Add(new PointF (center.X - x.Width/2, center.Y - x.Height/2));
+            s.Add(new PointF (s[0].X + x.Width, s[0].Y));
+            s.Add(new PointF (s[0].X, s[0].Y + x.Height));
+            s.Add(new PointF (s[0].X + x.Width, s[0].Y + x.Height));
+            t.Interval = 10;
             t.Tick += new EventHandler(tick);
             t.Start();
+            Resize += new EventHandler(OnResize);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -44,19 +39,19 @@ namespace chessings
         {
             for (int i = 0; i < s.Count; i++)
             {
-                //rotating by pi/6
-                //int X = (int)((s[i].X - center.X) * 1.7321 / 2 - (s[i].Y - center.Y) / 2); int Y = (int)((s[i].X - center.X) / 2 + (s[i].Y - center.Y) * 1.7321 / 2);
+                float X = (float) ((s[i].X - center.X) * Math.Cos(Math.PI/120) - (s[i].Y - center.Y) * Math.Sin(Math.PI / 120)); 
+                float Y = (float) ((s[i].X - center.X) * Math.Sin(Math.PI / 120) + (s[i].Y - center.Y) * Math.Cos(Math.PI/120));
 
                 //rotating by pi/2 (makes no difference but still)
                 //int X = -(s[i].Y - center.Y); int Y = s[i].X - center.X;
 
-                //rotating by pi/4
-                int X = (int)((s[i].X - center.X) * 1.414 / 2 - (s[i].Y - center.Y) * 1.414 / 2);
-                int Y = (int)((s[i].X - center.X) * 1.414 / 2 + (s[i].Y - center.Y) * 1.414 / 2);
-
-
-                s[i] = new Point(X + center.X, Y + center.Y);
+                s[i] = new PointF(X + center.X, Y + center.Y);
             }
+            Invalidate();
+        }
+        protected void OnResize(object sender, EventArgs e)
+        {
+            center = new Point(Width / 2, Height / 2);
             Invalidate();
         }
     }
